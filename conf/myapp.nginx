@@ -1,0 +1,16 @@
+server {
+    listen 80;
+    server_name myapp.django;
+    # Здесь можно оставить только один location и в набор docker-compose добавить ещё один контейнер с Nginx где прописать обслуживание статики и другие ресурсы
+    # Но самый простой способ реализовать Nginx и Docker со static:
+
+    location /static/ {
+        alias /opt/myapp_static/;
+    }
+
+
+    location / {
+        include proxy_params;
+        proxy_pass http://localhost:8000;
+    }
+}
