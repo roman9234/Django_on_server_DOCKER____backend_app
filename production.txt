@@ -1,3 +1,11 @@
+//Смотрим лог если не работает
+sudo tail -f /var/log/syslog
+
+//Если изменили настройки сокета:
+sudo systemctl daemon-reload
+
+
+
 Vagrant – консольная утилита, которая управляет виртуальными машинами.
 По умолчанию Vagrant работает с системой виртуализации VirtualBox.
 
@@ -107,64 +115,42 @@ sudo docker compose up -d --build
 //Запрос к контейнеру
 curl http://localhost:8000
 
+Получили ответ - значит Django работает
+
 ---- Готовим Nginx локально
 
 //Установим его:
-sudo apt install nginx
+sudo apt install -y nginx
+
+Удаляем конфигурацию которая стоит по умолчанию
+sudo rm /etc/nginx/sites-enabled/default
 
 
+Есть в каталоге настроек Nginx два каталога которые нас интересуют:
+Sites available - доступные сайты (которые Nginx мог бы обслуживать)
+Sites  Enabled - сайты которые Nginx реально обслуживает. Содержит симулинки на файлы которые лежат вsites available
+
+//Сделаем симулинк к нашим настройкам
+sudo ln -s /opt/myapp/conf/myapp.nginx /etc/nginx/sites-available/
 
 
-//Устанавливаем pip venv postgres nginx - они нужны для проекта
--y или --assume-yes   чтобы не запрашивался ввод Y/n
---quiet или -q   уменьшает вывод в терминале.
-sudo apt install -y python3-pip python3-virtualenv postgresql nginx
+//Теперь сделаем из него симулинк в enabled
+sudo ln -s /etc/nginx/sites-available/myapp.nginx /etc/nginx/sites-enabled/
 
-Создаём виртуальное окружение. --always-copy так как используется синхронизация папок
-virtualenv venv --always-copy
+//Конфигурацию подложили в каталог настроек Nginx, она должна сработать
+cat /etc/nginx/sites-enabled/myapp.nginx
+//Проверим что nginx не видит в конфигурации ошибку, и синтаксис корректен
+sudo nginx -t
 
-//активация окружения
-. ./venv/bin/activate
+//Теперь нужно перезапустить сервис Nginx для того чтобы он применил эти настройки
+//Так как он всё ещё работает с настройкой, которая была до наших манипуляций
+sudo systemctl restart nginx
 
-//Устанавиваем зависимости
-pip install -r requirements.txt
-
-//Войдём в консоль postgres
-sudo -u postgres psql
-
-//Проверка версии
-select version();
-
-//Создадим базу
-create database django_app;
-create user django_app with password 'django_app';
-grant all privileges on database django_app to django_app;
-
-//Так как postgres 15 версии:
-alter database django_app owner to django_app;
-\q
-
-Начальная настройка postgres закончена
-
-python3 ./django_project/manage.py migrate
-python3 ./django_project/manage.py createsuperuser
-admin
-admin@example.com
-admin
-admin
+//Каталоги:
+sudo ls myapp_data
+sudo ls myapp_static
 
 
-База создана схема применена суперпользователь создан
-
-
-//Смотрим лог если не работает
-sudo tail -f /var/log/syslog
-
-//Если изменили настройки сокета:
-sudo systemctl daemon-reload
-
-
-
-
+Если надо перенести проект, берём Docker-compose, каталог myapp_data и переносим на новый сервер
 
 

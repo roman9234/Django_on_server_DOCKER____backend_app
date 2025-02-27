@@ -26,6 +26,12 @@ services:
       - "/opt/myapp_static:/static"
 #   При перезапуске VM все компоненты тоже будут запущены
     restart: always
+#   Переменные окружения контейнера, используются в settings.py
+    environment:
+      DB_NAME: django_app
+      DB_USER: django_app
+      DB_PASSWORD: django_app
+
 
 # Добавим в приложение базу данных
 # Её также нужно добавить в SETTINGS приложения Django

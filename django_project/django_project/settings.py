@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -86,10 +86,9 @@ DATABASES = {
         # Стандартный порт
         'PORT': 5432,
         # Переменная названия БД, указана в environment
-        'NAME': 'django_app',
-        # Пользователь и пароль
-        'USER': 'django_app',
-        'PASSWORD': 'django_app',
+        'NAME': os.getenv("DB_NAME"),
+        'USER': os.getenv("DB_USER"),
+        'PASSWORD': os.getenv("DB_PASSWORD"),
     }
 }
 

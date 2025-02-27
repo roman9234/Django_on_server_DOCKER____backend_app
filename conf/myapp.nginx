@@ -8,7 +8,7 @@ server {
         alias /opt/myapp_static/;
     }
 
-
+    # Здесь обращаемся не к юникс сокету, а к локалхост
     location / {
         include proxy_params;
         proxy_pass http://localhost:8000;
